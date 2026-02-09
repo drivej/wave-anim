@@ -23,23 +23,7 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-      {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}> */}
-        <WaveAnimReact
-          width={dimensions.width * 0.9}
-          height={300}
-          audioSrc={audioSrc}
-          //style={{
-            // position: 'fixed',
-            // top: 0,
-            // left: 0,
-            // zIndex: -1
-          //}}
-        />
-
-        {/* <div className='Xcontent p-2' style={{padding:5}}>
-          <h4>Audio Visualization</h4>
-        </div> */}
-      {/* </div> */}
+      <WaveAnimReact width={dimensions.width * 0.9} height={300} audioSrc={audioSrc} />
     </div>
   );
 }
