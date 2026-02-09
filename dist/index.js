@@ -1,28 +1,28 @@
 import { jsx as P } from "react/jsx-runtime";
-import { makeObservable as $, observable as p, action as u, reaction as g } from "mobx";
+import { makeObservable as $, observable as y, action as u, reaction as g } from "mobx";
 import { forwardRef as T, useRef as x, useImperativeHandle as A, useEffect as v, useState as m } from "react";
 import { Howl as L, Howler as f } from "howler";
-import { debounce as N } from "lodash";
-const k = 64, d = Array(k).fill(0), C = 10, I = 0.85, W = -80, S = -10, E = Math.pow(2, 11);
+import { debounce as W } from "lodash";
+const k = 64, d = Array(k).fill(0), C = 10, N = 0.85, I = -80, S = -10, E = Math.pow(2, 11);
 class D {
   constructor() {
-    this.bufferLength = 0, this.dataArray = new Uint8Array(), this.wave = d, this.fullWave = d, this.built = !1, this.nodesConnected = !1, this.howlId = -1, this.src = "", this.loaded = !1, this.isLoading = !1, this.shouldPlay = !1, this.throttle = 100, this.isMuted = !1, this.isLocked = !0, this.play = N(() => {
+    this.bufferLength = 0, this.dataArray = new Uint8Array(), this.wave = d, this.fullWave = d, this.built = !1, this.nodesConnected = !1, this.howlId = -1, this.src = "", this.loaded = !1, this.isLoading = !1, this.shouldPlay = !1, this.throttle = 100, this.isMuted = !1, this.isLocked = !0, this.play = W(() => {
       this.howl && (this.shouldPlay = !0, !this.howl.playing(this.howlId) && (this.howl.play(this.howlId), this.buildNodes(), this.hijackBuffer()));
     }, 50), $(this, {
-      wave: p,
-      fullWave: p,
+      wave: y,
+      fullWave: y,
       getWaveData: u,
       updateWave: u,
       seek: u.bound,
       tick: u.bound,
       resetWave: u,
-      loaded: p,
-      isLoading: p,
-      isMuted: p,
+      loaded: y,
+      isLoading: y,
+      isMuted: y,
       toggleMute: u.bound,
       setMute: u.bound,
-      shouldPlay: p,
-      isLocked: p
+      shouldPlay: y,
+      isLocked: y
     });
   }
   resetWave() {
@@ -89,7 +89,7 @@ class D {
     t?.bufferSource?.disconnect(), t?.bufferSource?.connect(this.analyserNode), this.nodesConnected || (this.analyserNode?.connect(this.gainNode), this.gainNode?.connect(f.ctx.destination), this.nodesConnected = !0);
   }
   buildNodes() {
-    this.built || (this.built = !0, this.analyserNode = f.ctx.createAnalyser(), this.analyserNode.minDecibels = W, this.analyserNode.maxDecibels = S, this.analyserNode.smoothingTimeConstant = I, this.analyserNode.fftSize = E, this.bufferLength = this.analyserNode.frequencyBinCount, this.dataArray = new Uint8Array(this.bufferLength), this.gainNode = f.ctx.createGain(), this.gainNode.gain.setValueAtTime(this.isMuted ? 0 : 1, f.ctx.currentTime));
+    this.built || (this.built = !0, this.analyserNode = f.ctx.createAnalyser(), this.analyserNode.minDecibels = I, this.analyserNode.maxDecibels = S, this.analyserNode.smoothingTimeConstant = N, this.analyserNode.fftSize = E, this.bufferLength = this.analyserNode.frequencyBinCount, this.dataArray = new Uint8Array(this.bufferLength), this.gainNode = f.ctx.createGain(), this.gainNode.gain.setValueAtTime(this.isMuted ? 0 : 1, f.ctx.currentTime));
   }
   updateWave() {
     this.wave = this.getWaveData();
@@ -110,15 +110,18 @@ class D {
     const a = this.howl._sounds?.[0]?._node?.bufferSource?.buffer;
     if (!a) return d;
     const s = a.getChannelData(0), c = Math.floor(s.length / t);
-    let r = [], e = 0, h = 0, n = 0, l = 0;
-    const y = Math.abs;
+    let r = [], e = 0, h = 0, n = 0, o = 0;
+    const p = Math.abs;
     for (e = 0; e < t; e++) {
-      for (n = 0, l = c * e, h = 0; h < c; h++)
-        n += y(s[l + h]);
+      for (n = 0, o = c * e, h = 0; h < c; h++)
+        n += p(s[o + h]);
       r.push(n / c);
     }
     const b = Math.pow(Math.max(...r), -1);
     return r = r.map((w) => w * b), isNaN(r[0]) && (r = d), r;
+  }
+  destroy() {
+    console.log("AudioWave destroy"), this.pause(), this.howl?.unload(), this.resetWave(), this.nodesConnected = !1, this.built = !1;
   }
 }
 class M {
@@ -170,31 +173,32 @@ class _ {
   draw(t) {
     this.clear();
     var i = this.$cvs.width, a = this.$cvs.height, s = a * 0.5, c = i / t.length;
-    let r = t.length, e, h, n, l;
+    let r = t.length, e, h, n, o;
     for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = this.waveColor, this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(i, s); r--; )
-      e = t[r], h = Math.round(r * c), n = e * a, l = s - n * 0.5, this.clipboard.ctx.lineTo(h, l);
+      e = t[r], h = Math.round(r * c), n = e * a, o = s - n * 0.5, this.clipboard.ctx.lineTo(h, o);
     this.clipboard.ctx.lineTo(0, s), this.clipboard.ctx.closePath(), this.clipboard.ctx.fill(), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, i, s, 0, 0, i, s), this.ctx.translate(0, a - 1), this.ctx.scale(1, -1), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, i, s, 0, 0, i, s);
   }
   drawBlob(t, i) {
     this.clear();
     var a = this.$cvs.width, s = this.$cvs.height, c = a / i;
-    let r = -1, e, h, n, l;
+    let r = -1, e, h, n, o;
     for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = "#fff", this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(0, s * 0.5); r++ < i; )
-      e = t[r], h = Math.round(r * c), n = e / 255 * s, l = s * 0.5 - n * 0.5, this.clipboard.ctx.lineTo(h, l);
+      e = t[r], h = Math.round(r * c), n = e / 255 * s, o = s * 0.5 - n * 0.5, this.clipboard.ctx.lineTo(h, o);
     this.clipboard.ctx.lineTo(a, s * 0.5), this.clipboard.ctx.closePath(), this.clipboard.ctx.fill(), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, a, s * 0.5, 0, 0, a, s * 0.5), this.ctx.translate(0, s - 1), this.ctx.scale(1, -1), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, a, s * 0.5, 0, 0, a, s * 0.5);
   }
   setSize(t, i) {
     this.width = t, this.height = i, this.clipboard.setSize(t, i), this.clipboard.ctx.drawImage(this.$cvs, 0, 0, this.width, this.height, 0, 0, t, i), this.$cvs.width = t, this.$cvs.height = i, this.ctx.drawImage(this.clipboard.$cvs, 0, 0), this.ctx.fillStyle = this.waveColor, this.overlay.setSize(t, i), this.drawOverlay();
   }
 }
-const j = T(({ width: o, height: t, className: i, style: a, audioSrc: s, ...c }, r) => {
+const j = T(({ width: l, height: t, className: i, style: a, audioSrc: s, ...c }, r) => {
   const e = x(new D()), h = x(new _()), n = x(null);
   return A(r, () => ({
     play: () => e.current.play(),
     pause: () => e.current.pause(),
     togglePlay: () => e.current.togglePlay(),
     toggleMute: () => e.current.toggleMute(),
-    setMute: (l) => e.current.setMute(l),
+    setMute: (o) => e.current.setMute(o),
+    destroy: () => e.current.destroy(),
     get isPlaying() {
       return e.current.shouldPlay;
     },
@@ -204,36 +208,36 @@ const j = T(({ width: o, height: t, className: i, style: a, audioSrc: s, ...c },
     get isLocked() {
       return e.current.isLocked;
     },
-    subscribe: (l) => {
-      const y = g(
+    subscribe: (o) => {
+      const p = g(
         () => e.current.shouldPlay,
-        () => l({
+        () => o({
           isPlaying: e.current.shouldPlay,
           isMuted: e.current.isMuted,
           isLocked: e.current.isLocked
         })
       ), b = g(
         () => e.current.isMuted,
-        () => l({
+        () => o({
           isPlaying: e.current.shouldPlay,
           isMuted: e.current.isMuted,
           isLocked: e.current.isLocked
         })
       ), w = g(
         () => e.current.isLocked,
-        () => l({
+        () => o({
           isPlaying: e.current.shouldPlay,
           isMuted: e.current.isMuted,
           isLocked: e.current.isLocked
         })
       );
       return () => {
-        y(), b(), w();
+        p(), b(), w();
       };
     }
   })), v(() => {
-    const l = n.current;
-    l && (l.innerHTML = "", h.current.setSize(o, t), l.appendChild(h.current.$cvs), l.appendChild(h.current.overlay.$cvs), l.style.cursor = "pointer", Object.assign(h.current.overlay.$cvs.style, {
+    const o = n.current;
+    o && (o.innerHTML = "", h.current.setSize(l, t), o.appendChild(h.current.$cvs), o.appendChild(h.current.overlay.$cvs), o.style.cursor = "pointer", Object.assign(h.current.overlay.$cvs.style, {
       position: "absolute",
       inset: "0",
       width: "100%",
@@ -246,18 +250,18 @@ const j = T(({ width: o, height: t, className: i, style: a, audioSrc: s, ...c },
       height: "100%"
     }));
   }, []), v(() => {
-    h.current.setSize(o, t);
-  }, [o, t]), v(() => {
+    h.current.setSize(l, t);
+  }, [l, t]), v(() => {
     if (!s) return;
     e.current.setSource(s), e.current.pause(), e.current.setMute(!0);
-    const l = g(
+    const o = g(
       () => e.current.wave,
-      (y) => {
-        h.current.draw(y);
+      (p) => {
+        h.current.draw(p);
       }
     );
     return () => {
-      l();
+      o();
     };
   }, [s]), /* @__PURE__ */ P(
     "div",
@@ -267,7 +271,7 @@ const j = T(({ width: o, height: t, className: i, style: a, audioSrc: s, ...c },
       ...c,
       style: {
         backgroundColor: "#121212",
-        width: `${o}px`,
+        width: `${l}px`,
         height: `${t}px`,
         position: "relative",
         overflow: "hidden",
@@ -275,11 +279,11 @@ const j = T(({ width: o, height: t, className: i, style: a, audioSrc: s, ...c },
       }
     }
   );
-}), G = (o) => {
+}), G = (l) => {
   const [t, i] = m(!0), [a, s] = m(!0), [c, r] = m(!1);
-  return v(() => o.current ? (i(o.current.isLocked), s(o.current.isMuted), r(o.current.isPlaying), o.current.setMute(!1), o.current.subscribe((h) => {
+  return v(() => l.current ? (i(l.current.isLocked), s(l.current.isMuted), r(l.current.isPlaying), l.current.setMute(!1), l.current.subscribe((h) => {
     r(h.isPlaying), s(h.isMuted), i(h.isLocked);
-  })) : void 0, [o]), { isLocked: t, isMuted: a, isPlaying: c, togglePlay: o.current?.togglePlay, toggleMute: o.current?.toggleMute };
+  })) : void 0, [l]), { isLocked: t, isMuted: a, isPlaying: c, togglePlay: l.current?.togglePlay, toggleMute: l.current?.toggleMute, destroy: l.current?.destroy };
 };
 export {
   j as WaveAnimReact,

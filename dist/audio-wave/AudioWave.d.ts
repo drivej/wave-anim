@@ -49,5 +49,6 @@ export declare class AudioWave implements IAudioWave {
     getRawWave(): Uint8Array<ArrayBuffer>;
     getWaveData(): WaveModel;
     getFullWave(samples?: number): WaveModel;
+    destroy(): void;
 }
 //# sourceMappingURL=AudioWave.d.ts.map

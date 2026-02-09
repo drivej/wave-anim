@@ -18,6 +18,7 @@ export type WaveAnimHandle = {
   isPlaying: boolean;
   isMuted: boolean;
   isLocked: boolean;
+  destroy: () => void;
   subscribe: (callback: (state: { isPlaying: boolean; isMuted: boolean; isLocked: boolean }) => void) => () => void;
 };
 
@@ -32,6 +33,7 @@ export const WaveAnimReact = forwardRef<WaveAnimHandle, WaveAnimReactProps>(({ w
     togglePlay: () => audioWave.current.togglePlay(),
     toggleMute: () => audioWave.current.toggleMute(),
     setMute: (muted: boolean) => audioWave.current.setMute(muted),
+    destroy: () => audioWave.current.destroy(),
     get isPlaying() {
       return audioWave.current.shouldPlay;
     },
@@ -174,6 +176,6 @@ export const useWaveControls = (waveRef: React.RefObject<WaveAnimHandle>) => {
     });
     return unsubscribe;
   }, [waveRef]);
-  
-  return { isLocked, isMuted, isPlaying, togglePlay: waveRef.current?.togglePlay, toggleMute: waveRef.current?.toggleMute };
+
+  return { isLocked, isMuted, isPlaying, togglePlay: waveRef.current?.togglePlay, toggleMute: waveRef.current?.toggleMute, destroy: waveRef.current?.destroy };
 };

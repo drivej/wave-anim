@@ -13,6 +13,7 @@ export type WaveAnimHandle = {
     isPlaying: boolean;
     isMuted: boolean;
     isLocked: boolean;
+    destroy: () => void;
     subscribe: (callback: (state: {
         isPlaying: boolean;
         isMuted: boolean;
@@ -26,5 +27,6 @@ export declare const useWaveControls: (waveRef: React.RefObject<WaveAnimHandle>)
     isPlaying: boolean;
     togglePlay: (() => void) | undefined;
     toggleMute: (() => void) | undefined;
+    destroy: (() => void) | undefined;
 };
 //# sourceMappingURL=WaveAnimReact.d.ts.map

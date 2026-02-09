@@ -292,4 +292,13 @@ export class AudioWave implements IAudioWave {
     }
     return chunks;
   }
+
+  destroy(): void {
+    console.log('AudioWave destroy');
+    this.pause();
+    this.howl?.unload();
+    this.resetWave();
+    this.nodesConnected = false;
+    this.built = false;
+  }
 }
