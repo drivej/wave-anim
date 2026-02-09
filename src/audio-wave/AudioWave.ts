@@ -9,7 +9,7 @@ We can get away with a low frame rate by animating the transition in the wave
 Theoretically, the sound processing is more intensive than the animation
 
 */
-const debug = true;
+const debug = false;
 
 const MIN_WAVE_ARRAY_LENGTH = 64;
 const DEFAULT_WAVE = Array(MIN_WAVE_ARRAY_LENGTH).fill(0);

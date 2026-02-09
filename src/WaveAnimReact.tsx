@@ -100,7 +100,6 @@ export const WaveAnimReact: React.FC<WaveAnimReactProps> = ({ width, height, cla
 
   const onClick = () => {
     audioWave.current.togglePlay();
-    console.log('isMuted', audioWave.current.isMuted);
     setIsMuted(audioWave.current.isMuted);
   };
 
