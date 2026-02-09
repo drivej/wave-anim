@@ -138,6 +138,7 @@ export const WaveAnimReact = forwardRef<WaveAnimHandle, WaveAnimReactProps>(({ w
 
     return () => {
       disposeWave();
+      audioWave.current.destroy();
     };
   }, [audioSrc]);
 
