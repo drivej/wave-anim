@@ -1,35 +1,35 @@
-import { jsxs as C, jsx as g, Fragment as D } from "react/jsx-runtime";
-import { makeObservable as E, observable as v, action as n, reaction as b } from "mobx";
-import { forwardRef as F, useRef as k, useState as M, useImperativeHandle as _, useEffect as $ } from "react";
-import { Howl as z, Howler as w } from "howler";
-import { debounce as R } from "lodash";
-const A = 64, d = Array(A).fill(0), B = 10, j = 0.85, q = -80, O = -10, G = Math.pow(2, 11);
-class H {
+import { jsx as P } from "react/jsx-runtime";
+import { makeObservable as $, observable as p, action as u, reaction as g } from "mobx";
+import { forwardRef as T, useRef as x, useImperativeHandle as A, useEffect as v, useState as m } from "react";
+import { Howl as L, Howler as f } from "howler";
+import { debounce as N } from "lodash";
+const k = 64, d = Array(k).fill(0), C = 10, I = 0.85, W = -80, S = -10, E = Math.pow(2, 11);
+class D {
   constructor() {
-    this.bufferLength = 0, this.dataArray = new Uint8Array(), this.wave = d, this.fullWave = d, this.built = !1, this.nodesConnected = !1, this.howlId = -1, this.src = "", this.loaded = !1, this.isLoading = !1, this.shouldPlay = !1, this.throttle = 100, this.isMuted = !1, this.isLocked = !0, this.play = R(() => {
+    this.bufferLength = 0, this.dataArray = new Uint8Array(), this.wave = d, this.fullWave = d, this.built = !1, this.nodesConnected = !1, this.howlId = -1, this.src = "", this.loaded = !1, this.isLoading = !1, this.shouldPlay = !1, this.throttle = 100, this.isMuted = !1, this.isLocked = !0, this.play = N(() => {
       this.howl && (this.shouldPlay = !0, !this.howl.playing(this.howlId) && (this.howl.play(this.howlId), this.buildNodes(), this.hijackBuffer()));
-    }, 50), E(this, {
-      wave: v,
-      fullWave: v,
-      getWaveData: n,
-      updateWave: n,
-      seek: n.bound,
-      tick: n.bound,
-      resetWave: n,
-      loaded: v,
-      isLoading: v,
-      isMuted: v,
-      toggleMute: n.bound,
-      setMute: n.bound,
-      shouldPlay: v,
-      isLocked: v
+    }, 50), $(this, {
+      wave: p,
+      fullWave: p,
+      getWaveData: u,
+      updateWave: u,
+      seek: u.bound,
+      tick: u.bound,
+      resetWave: u,
+      loaded: p,
+      isLoading: p,
+      isMuted: p,
+      toggleMute: u.bound,
+      setMute: u.bound,
+      shouldPlay: p,
+      isLocked: p
     });
   }
   resetWave() {
     this.wave = d, this.fullWave = d;
   }
   setSource(t) {
-    this.src !== t && (this.src = t, this.loaded = !1, this.isLoading = !0, this.stopTick(), this.howl && (this.howl.stop(), this.howl.unload()), this.resetWave(), this.nodesConnected = !1, this.built = !1, this.howl = new z({
+    this.src !== t && (this.src = t, this.loaded = !1, this.isLoading = !0, this.stopTick(), this.howl && (this.howl.stop(), this.howl.unload()), this.resetWave(), this.nodesConnected = !1, this.built = !1, this.howl = new L({
       src: t,
       autoplay: !1,
       mute: !1,
@@ -41,13 +41,13 @@ class H {
       onpause: () => {
         this.shouldPlay ? this.play() : this.stopTick();
       },
-      onload: n(() => {
+      onload: u(() => {
         this.fullWave = this.getFullWave(), this.loaded = !0, this.isLoading = !1, this.shouldPlay && this.play();
       }),
-      onend: n(() => {
+      onend: u(() => {
         this.wave = d, this.shouldPlay = !1;
       }),
-      onunlock: n(() => {
+      onunlock: u(() => {
         this.isLocked = !1;
       })
     }), this.howlId = this.howl.play(), this.howl.pause(this.howlId));
@@ -65,7 +65,7 @@ class H {
     this.isMuted = t, this.updateGain();
   }
   updateGain() {
-    this.gainNode && this.gainNode.gain.setValueAtTime(this.isMuted ? 0 : 1, w.ctx.currentTime);
+    this.gainNode && this.gainNode.gain.setValueAtTime(this.isMuted ? 0 : 1, f.ctx.currentTime);
   }
   seek(t = 0) {
     this.howl.pause(this.howlId), this.howl.seek(t, this.howlId);
@@ -79,17 +79,17 @@ class H {
   tick() {
     this.tickTimeout = setTimeout(() => {
       this.updateWave(), this.requestFrame = requestAnimationFrame(this.tick);
-    }, this.throttle / B);
+    }, this.throttle / C);
   }
   stopTick() {
     this.tickTimeout && clearTimeout(this.tickTimeout), this.requestFrame && cancelAnimationFrame(this.requestFrame);
   }
   hijackBuffer() {
     const t = this.howl._sounds?.[0]?._node;
-    t?.bufferSource?.disconnect(), t?.bufferSource?.connect(this.analyserNode), this.nodesConnected || (this.analyserNode?.connect(this.gainNode), this.gainNode?.connect(w.ctx.destination), this.nodesConnected = !0);
+    t?.bufferSource?.disconnect(), t?.bufferSource?.connect(this.analyserNode), this.nodesConnected || (this.analyserNode?.connect(this.gainNode), this.gainNode?.connect(f.ctx.destination), this.nodesConnected = !0);
   }
   buildNodes() {
-    this.built || (this.built = !0, this.analyserNode = w.ctx.createAnalyser(), this.analyserNode.minDecibels = q, this.analyserNode.maxDecibels = O, this.analyserNode.smoothingTimeConstant = j, this.analyserNode.fftSize = G, this.bufferLength = this.analyserNode.frequencyBinCount, this.dataArray = new Uint8Array(this.bufferLength), this.gainNode = w.ctx.createGain(), this.gainNode.gain.setValueAtTime(1, 0));
+    this.built || (this.built = !0, this.analyserNode = f.ctx.createAnalyser(), this.analyserNode.minDecibels = W, this.analyserNode.maxDecibels = S, this.analyserNode.smoothingTimeConstant = I, this.analyserNode.fftSize = E, this.bufferLength = this.analyserNode.frequencyBinCount, this.dataArray = new Uint8Array(this.bufferLength), this.gainNode = f.ctx.createGain(), this.gainNode.gain.setValueAtTime(this.isMuted ? 0 : 1, f.ctx.currentTime));
   }
   updateWave() {
     this.wave = this.getWaveData();
@@ -101,7 +101,7 @@ class H {
     if (this.analyserNode) {
       this.analyserNode.getByteFrequencyData(this.dataArray);
       let t = this.dataArray.length;
-      for (; t-- && t > A && this.dataArray[t] === 0; ) ;
+      for (; t-- && t > k && this.dataArray[t] === 0; ) ;
       return Array.from(this.dataArray.slice(0, t)).map((i) => i / 255);
     }
     return d;
@@ -109,19 +109,19 @@ class H {
   getFullWave(t = 500) {
     const a = this.howl._sounds?.[0]?._node?.bufferSource?.buffer;
     if (!a) return d;
-    const s = a.getChannelData(0), r = Math.floor(s.length / t);
-    let e = [], h = 0, l = 0, o = 0, c = 0;
-    const m = Math.abs;
-    for (h = 0; h < t; h++) {
-      for (o = 0, c = r * h, l = 0; l < r; l++)
-        o += m(s[c + l]);
-      e.push(o / r);
+    const s = a.getChannelData(0), c = Math.floor(s.length / t);
+    let r = [], e = 0, h = 0, n = 0, l = 0;
+    const y = Math.abs;
+    for (e = 0; e < t; e++) {
+      for (n = 0, l = c * e, h = 0; h < c; h++)
+        n += y(s[l + h]);
+      r.push(n / c);
     }
-    const y = Math.pow(Math.max(...e), -1);
-    return e = e.map((x) => x * y), isNaN(e[0]) && (e = d), e;
+    const b = Math.pow(Math.max(...r), -1);
+    return r = r.map((w) => w * b), isNaN(r[0]) && (r = d), r;
   }
 }
-class T {
+class M {
   $cvs;
   ctx;
   width;
@@ -136,9 +136,9 @@ class T {
     this.width = t, this.height = i, this.$cvs.width = t, this.$cvs.height = i;
   }
 }
-class V {
-  clipboard = new T();
-  overlay = new T();
+class _ {
+  clipboard = new M();
+  overlay = new M();
   $cvs;
   ctx;
   wave = [];
@@ -157,8 +157,8 @@ class V {
   clear() {
     let t = this.$cvs.width, i = this.$cvs.height;
     this.ctx.save();
-    let a = t * this.scaleDeltaX, s = i * this.scaleDeltaY, r = (t - a) * 0.5, e = (i - s) * 0.5, h = 1.1;
-    this.ctx.globalAlpha = this.fadeRate, this.ctx.filter = `blur(${h}px) hue-rotate(${this.hue}deg)`, this.clipboard.clear(), this.clipboard.ctx.drawImage(this.$cvs, 0, 0), this.ctx.clearRect(0, 0, t, i), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, t, i, r, e, a, s), this.ctx.restore();
+    let a = t * this.scaleDeltaX, s = i * this.scaleDeltaY, c = (t - a) * 0.5, r = (i - s) * 0.5, e = 1.1;
+    this.ctx.globalAlpha = this.fadeRate, this.ctx.filter = `blur(${e}px) hue-rotate(${this.hue}deg)`, this.clipboard.clear(), this.clipboard.ctx.drawImage(this.$cvs, 0, 0), this.ctx.clearRect(0, 0, t, i), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, t, i, c, r, a, s), this.ctx.restore();
   }
   drawOverlay() {
     this.overlay.clear();
@@ -169,31 +169,32 @@ class V {
   }
   draw(t) {
     this.clear();
-    var i = this.$cvs.width, a = this.$cvs.height, s = a * 0.5, r = i / t.length;
-    let e = t.length, h, l, o, c;
-    for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = this.waveColor, this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(i, s); e--; )
-      h = t[e], l = Math.round(e * r), o = h * a, c = s - o * 0.5, this.clipboard.ctx.lineTo(l, c);
+    var i = this.$cvs.width, a = this.$cvs.height, s = a * 0.5, c = i / t.length;
+    let r = t.length, e, h, n, l;
+    for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = this.waveColor, this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(i, s); r--; )
+      e = t[r], h = Math.round(r * c), n = e * a, l = s - n * 0.5, this.clipboard.ctx.lineTo(h, l);
     this.clipboard.ctx.lineTo(0, s), this.clipboard.ctx.closePath(), this.clipboard.ctx.fill(), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, i, s, 0, 0, i, s), this.ctx.translate(0, a - 1), this.ctx.scale(1, -1), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, i, s, 0, 0, i, s);
   }
   drawBlob(t, i) {
     this.clear();
-    var a = this.$cvs.width, s = this.$cvs.height, r = a / i;
-    let e = -1, h, l, o, c;
-    for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = "#fff", this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(0, s * 0.5); e++ < i; )
-      h = t[e], l = Math.round(e * r), o = h / 255 * s, c = s * 0.5 - o * 0.5, this.clipboard.ctx.lineTo(l, c);
+    var a = this.$cvs.width, s = this.$cvs.height, c = a / i;
+    let r = -1, e, h, n, l;
+    for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = "#fff", this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(0, s * 0.5); r++ < i; )
+      e = t[r], h = Math.round(r * c), n = e / 255 * s, l = s * 0.5 - n * 0.5, this.clipboard.ctx.lineTo(h, l);
     this.clipboard.ctx.lineTo(a, s * 0.5), this.clipboard.ctx.closePath(), this.clipboard.ctx.fill(), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, a, s * 0.5, 0, 0, a, s * 0.5), this.ctx.translate(0, s - 1), this.ctx.scale(1, -1), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, a, s * 0.5, 0, 0, a, s * 0.5);
   }
   setSize(t, i) {
     this.width = t, this.height = i, this.clipboard.setSize(t, i), this.clipboard.ctx.drawImage(this.$cvs, 0, 0, this.width, this.height, 0, 0, t, i), this.$cvs.width = t, this.$cvs.height = i, this.ctx.drawImage(this.clipboard.$cvs, 0, 0), this.ctx.fillStyle = this.waveColor, this.overlay.setSize(t, i), this.drawOverlay();
   }
 }
-const K = F(({ width: u, height: t, className: i, style: a, audioSrc: s }, r) => {
-  const e = k(new H()), h = k(new V()), l = k(null), [o, c] = M(!1), [m, y] = M(!0), [x, I] = M(!0);
-  _(r, () => ({
+const j = T(({ width: o, height: t, className: i, style: a, audioSrc: s, ...c }, r) => {
+  const e = x(new D()), h = x(new _()), n = x(null);
+  return A(r, () => ({
     play: () => e.current.play(),
     pause: () => e.current.pause(),
     togglePlay: () => e.current.togglePlay(),
     toggleMute: () => e.current.toggleMute(),
+    setMute: (l) => e.current.setMute(l),
     get isPlaying() {
       return e.current.shouldPlay;
     },
@@ -202,10 +203,37 @@ const K = F(({ width: u, height: t, className: i, style: a, audioSrc: s }, r) =>
     },
     get isLocked() {
       return e.current.isLocked;
+    },
+    subscribe: (l) => {
+      const y = g(
+        () => e.current.shouldPlay,
+        () => l({
+          isPlaying: e.current.shouldPlay,
+          isMuted: e.current.isMuted,
+          isLocked: e.current.isLocked
+        })
+      ), b = g(
+        () => e.current.isMuted,
+        () => l({
+          isPlaying: e.current.shouldPlay,
+          isMuted: e.current.isMuted,
+          isLocked: e.current.isLocked
+        })
+      ), w = g(
+        () => e.current.isLocked,
+        () => l({
+          isPlaying: e.current.shouldPlay,
+          isMuted: e.current.isMuted,
+          isLocked: e.current.isLocked
+        })
+      );
+      return () => {
+        y(), b(), w();
+      };
     }
-  })), $(() => {
-    const p = l.current;
-    p && (p.innerHTML = "", h.current.setSize(u, t), p.appendChild(h.current.$cvs), p.appendChild(h.current.overlay.$cvs), p.style.cursor = "pointer", Object.assign(h.current.overlay.$cvs.style, {
+  })), v(() => {
+    const l = n.current;
+    l && (l.innerHTML = "", h.current.setSize(o, t), l.appendChild(h.current.$cvs), l.appendChild(h.current.overlay.$cvs), l.style.cursor = "pointer", Object.assign(h.current.overlay.$cvs.style, {
       position: "absolute",
       inset: "0",
       width: "100%",
@@ -217,61 +245,45 @@ const K = F(({ width: u, height: t, className: i, style: a, audioSrc: s }, r) =>
       width: "100%",
       height: "100%"
     }));
-  }, []), $(() => {
-    h.current.setSize(u, t);
-  }, [u, t]), $(() => {
+  }, []), v(() => {
+    h.current.setSize(o, t);
+  }, [o, t]), v(() => {
     if (!s) return;
     e.current.setSource(s), e.current.pause(), e.current.setMute(!0);
-    const p = b(
+    const l = g(
       () => e.current.wave,
-      (f) => {
-        h.current.draw(f);
-      }
-    ), W = b(
-      () => e.current.shouldPlay,
-      (f) => c(!!f)
-    ), S = b(
-      () => e.current.isMuted,
-      (f) => y(!!f)
-    ), L = b(
-      () => e.current.isLocked,
-      (f) => {
-        I(!!f), y(e.current.isMuted);
+      (y) => {
+        h.current.draw(y);
       }
     );
     return () => {
-      p(), W(), S(), L();
+      l();
     };
-  }, [s]);
-  const N = () => {
-    e.current.togglePlay(), y(e.current.isMuted);
-  }, P = () => {
-    e.current.toggleMute();
-  };
-  return /* @__PURE__ */ C("div", { className: i, style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }, children: [
-    /* @__PURE__ */ g(
-      "div",
-      {
-        ref: l,
-        onClick: N,
-        style: {
-          backgroundColor: "#121212",
-          width: `${u}px`,
-          height: `${t}px`,
-          position: "relative",
-          overflow: "hidden",
-          ...a
-        }
+  }, [s]), /* @__PURE__ */ P(
+    "div",
+    {
+      ref: n,
+      className: i,
+      ...c,
+      style: {
+        backgroundColor: "#121212",
+        width: `${o}px`,
+        height: `${t}px`,
+        position: "relative",
+        overflow: "hidden",
+        ...a
       }
-    ),
-    /* @__PURE__ */ g("div", { className: "flex gap-2 p-2", children: x ? /* @__PURE__ */ g("span", { className: "px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: "Click anywhere to unlock audio player" }) : /* @__PURE__ */ C(D, { children: [
-      /* @__PURE__ */ g("button", { onClick: N, className: "px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: o ? "Pause" : "Play" }),
-      /* @__PURE__ */ g("button", { onClick: P, className: "px-6 py-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: m ? "Unmute" : "Mute" })
-    ] }) })
-  ] });
-});
+    }
+  );
+}), G = (o) => {
+  const [t, i] = m(!0), [a, s] = m(!0), [c, r] = m(!1);
+  return v(() => o.current ? (i(o.current.isLocked), s(o.current.isMuted), r(o.current.isPlaying), o.current.setMute(!1), o.current.subscribe((h) => {
+    r(h.isPlaying), s(h.isMuted), i(h.isLocked);
+  })) : void 0, [o]), { isLocked: t, isMuted: a, isPlaying: c, togglePlay: o.current?.togglePlay, toggleMute: o.current?.toggleMute };
+};
 export {
-  K as WaveAnimReact,
-  K as default
+  j as WaveAnimReact,
+  j as default,
+  G as useWaveControls
 };
 //# sourceMappingURL=index.js.map

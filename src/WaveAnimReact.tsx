@@ -3,11 +3,9 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import { AudioWave } from './audio-wave/AudioWave.js';
 import WaveCanvas from './wave-builder/WaveCanvas.js';
 
-export interface WaveAnimReactProps {
+export interface WaveAnimReactProps extends React.HTMLAttributes<HTMLDivElement> {
   width: number;
   height: number;
-  className?: string;
-  style?: React.CSSProperties;
   audioSrc?: string;
 }
 
@@ -16,24 +14,24 @@ export type WaveAnimHandle = {
   pause: () => void;
   togglePlay: () => void;
   toggleMute: () => void;
+  setMute: (muted: boolean) => void;
   isPlaying: boolean;
   isMuted: boolean;
   isLocked: boolean;
+  subscribe: (callback: (state: { isPlaying: boolean; isMuted: boolean; isLocked: boolean }) => void) => () => void;
 };
 
-export const WaveAnimReact = forwardRef<WaveAnimHandle, WaveAnimReactProps>(({ width, height, className, style, audioSrc }, ref) => {
+export const WaveAnimReact = forwardRef<WaveAnimHandle, WaveAnimReactProps>(({ width, height, className, style, audioSrc, ...rest }, ref) => {
   const audioWave = useRef(new AudioWave());
   const waveCanvas = useRef(new WaveCanvas());
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [isLocked, setIsLocked] = useState(true);
 
   useImperativeHandle(ref, () => ({
     play: () => audioWave.current.play(),
     pause: () => audioWave.current.pause(),
     togglePlay: () => audioWave.current.togglePlay(),
     toggleMute: () => audioWave.current.toggleMute(),
+    setMute: (muted: boolean) => audioWave.current.setMute(muted),
     get isPlaying() {
       return audioWave.current.shouldPlay;
     },
@@ -42,6 +40,44 @@ export const WaveAnimReact = forwardRef<WaveAnimHandle, WaveAnimReactProps>(({ w
     },
     get isLocked() {
       return audioWave.current.isLocked;
+    },
+    subscribe: (callback) => {
+      const disposePlay = reaction(
+        () => audioWave.current.shouldPlay,
+        () =>
+          callback({
+            isPlaying: audioWave.current.shouldPlay,
+            isMuted: audioWave.current.isMuted,
+            isLocked: audioWave.current.isLocked
+          })
+      );
+
+      const disposeMute = reaction(
+        () => audioWave.current.isMuted,
+        () =>
+          callback({
+            isPlaying: audioWave.current.shouldPlay,
+            isMuted: audioWave.current.isMuted,
+            isLocked: audioWave.current.isLocked
+          })
+      );
+
+      const disposeLock = reaction(
+        () => audioWave.current.isLocked,
+        () =>
+          callback({
+            isPlaying: audioWave.current.shouldPlay,
+            isMuted: audioWave.current.isMuted,
+            isLocked: audioWave.current.isLocked
+          })
+      );
+
+      // Return unsubscribe function
+      return () => {
+        disposePlay();
+        disposeMute();
+        disposeLock();
+      };
     }
   }));
 
@@ -98,45 +134,16 @@ export const WaveAnimReact = forwardRef<WaveAnimHandle, WaveAnimReactProps>(({ w
       }
     );
 
-    const disposePlay = reaction(
-      () => audioWave.current.shouldPlay,
-      (playing) => setIsPlaying(Boolean(playing))
-    );
-
-    const disposeMute = reaction(
-      () => audioWave.current.isMuted,
-      (muted) => setIsMuted(Boolean(muted))
-    );
-
-    const disposeLock = reaction(
-      () => audioWave.current.isLocked,
-      (isLocked) => {
-        setIsLocked(Boolean(isLocked));
-        setIsMuted(audioWave.current.isMuted);
-      }
-    );
-
     return () => {
       disposeWave();
-      disposePlay();
-      disposeMute();
-      disposeLock();
     };
   }, [audioSrc]);
-
-  const onClick = () => {
-    audioWave.current.togglePlay();
-    setIsMuted(audioWave.current.isMuted);
-  };
-
-  const onClickMute = () => {
-    audioWave.current.toggleMute();
-  };
 
   return (
     <div
       ref={containerRef}
-      onClick={onClick}
+      className={className}
+      {...rest}
       style={{
         backgroundColor: '#121212',
         width: `${width}px`,
@@ -148,3 +155,25 @@ export const WaveAnimReact = forwardRef<WaveAnimHandle, WaveAnimReactProps>(({ w
     />
   );
 });
+
+export const useWaveControls = (waveRef: React.RefObject<WaveAnimHandle>) => {
+  const [isLocked, setIsLocked] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!waveRef.current) return;
+    setIsLocked(waveRef.current.isLocked);
+    setIsMuted(waveRef.current.isMuted);
+    setIsPlaying(waveRef.current.isPlaying);
+    waveRef.current.setMute(false);
+    const unsubscribe = waveRef.current.subscribe((state) => {
+      setIsPlaying(state.isPlaying);
+      setIsMuted(state.isMuted);
+      setIsLocked(state.isLocked);
+    });
+    return unsubscribe;
+  }, [waveRef]);
+  
+  return { isLocked, isMuted, isPlaying, togglePlay: waveRef.current?.togglePlay, toggleMute: waveRef.current?.toggleMute };
+};

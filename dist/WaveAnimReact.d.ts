@@ -1,9 +1,7 @@
 import React from 'react';
-export interface WaveAnimReactProps {
+export interface WaveAnimReactProps extends React.HTMLAttributes<HTMLDivElement> {
     width: number;
     height: number;
-    className?: string;
-    style?: React.CSSProperties;
     audioSrc?: string;
 }
 export type WaveAnimHandle = {
@@ -11,9 +9,22 @@ export type WaveAnimHandle = {
     pause: () => void;
     togglePlay: () => void;
     toggleMute: () => void;
+    setMute: (muted: boolean) => void;
     isPlaying: boolean;
     isMuted: boolean;
     isLocked: boolean;
+    subscribe: (callback: (state: {
+        isPlaying: boolean;
+        isMuted: boolean;
+        isLocked: boolean;
+    }) => void) => () => void;
 };
 export declare const WaveAnimReact: React.ForwardRefExoticComponent<WaveAnimReactProps & React.RefAttributes<WaveAnimHandle>>;
+export declare const useWaveControls: (waveRef: React.RefObject<WaveAnimHandle>) => {
+    isLocked: boolean;
+    isMuted: boolean;
+    isPlaying: boolean;
+    togglePlay: (() => void) | undefined;
+    toggleMute: (() => void) | undefined;
+};
 //# sourceMappingURL=WaveAnimReact.d.ts.map

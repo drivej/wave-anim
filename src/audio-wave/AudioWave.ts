@@ -232,7 +232,8 @@ export class AudioWave implements IAudioWave {
       this.bufferLength = this.analyserNode.frequencyBinCount;
       this.dataArray = new Uint8Array(this.bufferLength);
       this.gainNode = Howler.ctx.createGain();
-      this.gainNode.gain.setValueAtTime(1, 0);
+      // Initialize gain based on current mute state
+      this.gainNode.gain.setValueAtTime(this.isMuted ? 0 : 1, Howler.ctx.currentTime);
     }
   }
 
