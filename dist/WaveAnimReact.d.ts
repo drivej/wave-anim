@@ -6,5 +6,14 @@ export interface WaveAnimReactProps {
     style?: React.CSSProperties;
     audioSrc?: string;
 }
-export declare const WaveAnimReact: React.FC<WaveAnimReactProps>;
+export type WaveAnimHandle = {
+    play: () => void;
+    pause: () => void;
+    togglePlay: () => void;
+    toggleMute: () => void;
+    isPlaying: boolean;
+    isMuted: boolean;
+    isLocked: boolean;
+};
+export declare const WaveAnimReact: React.ForwardRefExoticComponent<WaveAnimReactProps & React.RefAttributes<WaveAnimHandle>>;
 //# sourceMappingURL=WaveAnimReact.d.ts.map

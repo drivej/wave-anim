@@ -1,14 +1,14 @@
-import { jsxs as C, jsx as b, Fragment as L } from "react/jsx-runtime";
-import { makeObservable as D, observable as v, action as n, reaction as g } from "mobx";
-import { useRef as k, useState as $, useEffect as M } from "react";
-import { Howl as E, Howler as w } from "howler";
-import { debounce as F } from "lodash";
-const A = 64, d = Array(A).fill(0), _ = 10, z = 0.85, B = -80, R = -10, j = Math.pow(2, 11);
-class q {
+import { jsxs as C, jsx as g, Fragment as D } from "react/jsx-runtime";
+import { makeObservable as E, observable as v, action as n, reaction as b } from "mobx";
+import { forwardRef as F, useRef as k, useState as M, useImperativeHandle as _, useEffect as $ } from "react";
+import { Howl as z, Howler as w } from "howler";
+import { debounce as R } from "lodash";
+const A = 64, d = Array(A).fill(0), B = 10, j = 0.85, q = -80, O = -10, G = Math.pow(2, 11);
+class H {
   constructor() {
-    this.bufferLength = 0, this.dataArray = new Uint8Array(), this.wave = d, this.fullWave = d, this.built = !1, this.nodesConnected = !1, this.howlId = -1, this.src = "", this.loaded = !1, this.isLoading = !1, this.shouldPlay = !1, this.throttle = 100, this.isMuted = !1, this.isLocked = !0, this.play = F(() => {
+    this.bufferLength = 0, this.dataArray = new Uint8Array(), this.wave = d, this.fullWave = d, this.built = !1, this.nodesConnected = !1, this.howlId = -1, this.src = "", this.loaded = !1, this.isLoading = !1, this.shouldPlay = !1, this.throttle = 100, this.isMuted = !1, this.isLocked = !0, this.play = R(() => {
       this.howl && (this.shouldPlay = !0, !this.howl.playing(this.howlId) && (this.howl.play(this.howlId), this.buildNodes(), this.hijackBuffer()));
-    }, 50), D(this, {
+    }, 50), E(this, {
       wave: v,
       fullWave: v,
       getWaveData: n,
@@ -29,7 +29,7 @@ class q {
     this.wave = d, this.fullWave = d;
   }
   setSource(t) {
-    this.src !== t && (this.src = t, this.loaded = !1, this.isLoading = !0, this.stopTick(), this.howl && (this.howl.stop(), this.howl.unload()), this.resetWave(), this.nodesConnected = !1, this.built = !1, this.howl = new E({
+    this.src !== t && (this.src = t, this.loaded = !1, this.isLoading = !0, this.stopTick(), this.howl && (this.howl.stop(), this.howl.unload()), this.resetWave(), this.nodesConnected = !1, this.built = !1, this.howl = new z({
       src: t,
       autoplay: !1,
       mute: !1,
@@ -79,7 +79,7 @@ class q {
   tick() {
     this.tickTimeout = setTimeout(() => {
       this.updateWave(), this.requestFrame = requestAnimationFrame(this.tick);
-    }, this.throttle / _);
+    }, this.throttle / B);
   }
   stopTick() {
     this.tickTimeout && clearTimeout(this.tickTimeout), this.requestFrame && cancelAnimationFrame(this.requestFrame);
@@ -89,7 +89,7 @@ class q {
     t?.bufferSource?.disconnect(), t?.bufferSource?.connect(this.analyserNode), this.nodesConnected || (this.analyserNode?.connect(this.gainNode), this.gainNode?.connect(w.ctx.destination), this.nodesConnected = !0);
   }
   buildNodes() {
-    this.built || (this.built = !0, this.analyserNode = w.ctx.createAnalyser(), this.analyserNode.minDecibels = B, this.analyserNode.maxDecibels = R, this.analyserNode.smoothingTimeConstant = z, this.analyserNode.fftSize = j, this.bufferLength = this.analyserNode.frequencyBinCount, this.dataArray = new Uint8Array(this.bufferLength), this.gainNode = w.ctx.createGain(), this.gainNode.gain.setValueAtTime(1, 0));
+    this.built || (this.built = !0, this.analyserNode = w.ctx.createAnalyser(), this.analyserNode.minDecibels = q, this.analyserNode.maxDecibels = O, this.analyserNode.smoothingTimeConstant = j, this.analyserNode.fftSize = G, this.bufferLength = this.analyserNode.frequencyBinCount, this.dataArray = new Uint8Array(this.bufferLength), this.gainNode = w.ctx.createGain(), this.gainNode.gain.setValueAtTime(1, 0));
   }
   updateWave() {
     this.wave = this.getWaveData();
@@ -102,23 +102,23 @@ class q {
       this.analyserNode.getByteFrequencyData(this.dataArray);
       let t = this.dataArray.length;
       for (; t-- && t > A && this.dataArray[t] === 0; ) ;
-      return Array.from(this.dataArray.slice(0, t)).map((s) => s / 255);
+      return Array.from(this.dataArray.slice(0, t)).map((i) => i / 255);
     }
     return d;
   }
   getFullWave(t = 500) {
     const a = this.howl._sounds?.[0]?._node?.bufferSource?.buffer;
     if (!a) return d;
-    const e = a.getChannelData(0), h = Math.floor(e.length / t);
-    let i = [], l = 0, o = 0, r = 0, c = 0;
-    const y = Math.abs;
-    for (l = 0; l < t; l++) {
-      for (r = 0, c = h * l, o = 0; o < h; o++)
-        r += y(e[c + o]);
-      i.push(r / h);
+    const s = a.getChannelData(0), r = Math.floor(s.length / t);
+    let e = [], h = 0, l = 0, o = 0, c = 0;
+    const m = Math.abs;
+    for (h = 0; h < t; h++) {
+      for (o = 0, c = r * h, l = 0; l < r; l++)
+        o += m(s[c + l]);
+      e.push(o / r);
     }
-    const m = Math.pow(Math.max(...i), -1);
-    return i = i.map((x) => x * m), isNaN(i[0]) && (i = d), i;
+    const y = Math.pow(Math.max(...e), -1);
+    return e = e.map((x) => x * y), isNaN(e[0]) && (e = d), e;
   }
 }
 class T {
@@ -132,11 +132,11 @@ class T {
   clear() {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
-  setSize(t, s) {
-    this.width = t, this.height = s, this.$cvs.width = t, this.$cvs.height = s;
+  setSize(t, i) {
+    this.width = t, this.height = i, this.$cvs.width = t, this.$cvs.height = i;
   }
 }
-class O {
+class V {
   clipboard = new T();
   overlay = new T();
   $cvs;
@@ -155,87 +155,101 @@ class O {
     t?.waveColor && (this.waveColor = t.waveColor), this.$cvs = document.createElement("canvas"), this.ctx = this.$cvs.getContext("2d", { alpha: !0, desynchronized: !0 }), this.$clipboard = document.createElement("canvas"), this.clipboard_ctx = this.$clipboard.getContext("2d", { alpha: !0, desynchronized: !0 }), this.setSize(500, 200);
   }
   clear() {
-    let t = this.$cvs.width, s = this.$cvs.height;
+    let t = this.$cvs.width, i = this.$cvs.height;
     this.ctx.save();
-    let a = t * this.scaleDeltaX, e = s * this.scaleDeltaY, h = (t - a) * 0.5, i = (s - e) * 0.5, l = 1.1;
-    this.ctx.globalAlpha = this.fadeRate, this.ctx.filter = `blur(${l}px) hue-rotate(${this.hue}deg)`, this.clipboard.clear(), this.clipboard.ctx.drawImage(this.$cvs, 0, 0), this.ctx.clearRect(0, 0, t, s), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, t, s, h, i, a, e), this.ctx.restore();
+    let a = t * this.scaleDeltaX, s = i * this.scaleDeltaY, r = (t - a) * 0.5, e = (i - s) * 0.5, h = 1.1;
+    this.ctx.globalAlpha = this.fadeRate, this.ctx.filter = `blur(${h}px) hue-rotate(${this.hue}deg)`, this.clipboard.clear(), this.clipboard.ctx.drawImage(this.$cvs, 0, 0), this.ctx.clearRect(0, 0, t, i), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, t, i, r, e, a, s), this.ctx.restore();
   }
   drawOverlay() {
     this.overlay.clear();
-    let t = this.overlay.height, s = this.overlay.width, a = 2;
+    let t = this.overlay.height, i = this.overlay.width, a = 2;
     this.overlay.ctx.fillStyle = "#000";
-    for (var e = 0; e < s; e += a * 2)
-      this.overlay.ctx.fillRect(e, 0, a, t);
+    for (var s = 0; s < i; s += a * 2)
+      this.overlay.ctx.fillRect(s, 0, a, t);
   }
   draw(t) {
     this.clear();
-    var s = this.$cvs.width, a = this.$cvs.height, e = a * 0.5, h = s / t.length;
-    let i = t.length, l, o, r, c;
-    for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = this.waveColor, this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(s, e); i--; )
-      l = t[i], o = Math.round(i * h), r = l * a, c = e - r * 0.5, this.clipboard.ctx.lineTo(o, c);
-    this.clipboard.ctx.lineTo(0, e), this.clipboard.ctx.closePath(), this.clipboard.ctx.fill(), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, s, e, 0, 0, s, e), this.ctx.translate(0, a - 1), this.ctx.scale(1, -1), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, s, e, 0, 0, s, e);
+    var i = this.$cvs.width, a = this.$cvs.height, s = a * 0.5, r = i / t.length;
+    let e = t.length, h, l, o, c;
+    for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = this.waveColor, this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(i, s); e--; )
+      h = t[e], l = Math.round(e * r), o = h * a, c = s - o * 0.5, this.clipboard.ctx.lineTo(l, c);
+    this.clipboard.ctx.lineTo(0, s), this.clipboard.ctx.closePath(), this.clipboard.ctx.fill(), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, i, s, 0, 0, i, s), this.ctx.translate(0, a - 1), this.ctx.scale(1, -1), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, i, s, 0, 0, i, s);
   }
-  drawBlob(t, s) {
+  drawBlob(t, i) {
     this.clear();
-    var a = this.$cvs.width, e = this.$cvs.height, h = a / s;
-    let i = -1, l, o, r, c;
-    for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = "#fff", this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(0, e * 0.5); i++ < s; )
-      l = t[i], o = Math.round(i * h), r = l / 255 * e, c = e * 0.5 - r * 0.5, this.clipboard.ctx.lineTo(o, c);
-    this.clipboard.ctx.lineTo(a, e * 0.5), this.clipboard.ctx.closePath(), this.clipboard.ctx.fill(), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, a, e * 0.5, 0, 0, a, e * 0.5), this.ctx.translate(0, e - 1), this.ctx.scale(1, -1), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, a, e * 0.5, 0, 0, a, e * 0.5);
+    var a = this.$cvs.width, s = this.$cvs.height, r = a / i;
+    let e = -1, h, l, o, c;
+    for (this.clipboard.clear(), this.clipboard.ctx.fillStyle = "#fff", this.clipboard.ctx.beginPath(), this.clipboard.ctx.moveTo(0, s * 0.5); e++ < i; )
+      h = t[e], l = Math.round(e * r), o = h / 255 * s, c = s * 0.5 - o * 0.5, this.clipboard.ctx.lineTo(l, c);
+    this.clipboard.ctx.lineTo(a, s * 0.5), this.clipboard.ctx.closePath(), this.clipboard.ctx.fill(), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, a, s * 0.5, 0, 0, a, s * 0.5), this.ctx.translate(0, s - 1), this.ctx.scale(1, -1), this.ctx.drawImage(this.clipboard.$cvs, 0, 0, a, s * 0.5, 0, 0, a, s * 0.5);
   }
-  setSize(t, s) {
-    this.width = t, this.height = s, this.clipboard.setSize(t, s), this.clipboard.ctx.drawImage(this.$cvs, 0, 0, this.width, this.height, 0, 0, t, s), this.$cvs.width = t, this.$cvs.height = s, this.ctx.drawImage(this.clipboard.$cvs, 0, 0), this.ctx.fillStyle = this.waveColor, this.overlay.setSize(t, s), this.drawOverlay();
+  setSize(t, i) {
+    this.width = t, this.height = i, this.clipboard.setSize(t, i), this.clipboard.ctx.drawImage(this.$cvs, 0, 0, this.width, this.height, 0, 0, t, i), this.$cvs.width = t, this.$cvs.height = i, this.ctx.drawImage(this.clipboard.$cvs, 0, 0), this.ctx.fillStyle = this.waveColor, this.overlay.setSize(t, i), this.drawOverlay();
   }
 }
-const Y = ({ width: u, height: t, className: s, style: a, audioSrc: e }) => {
-  const h = k(new q()), i = k(new O()), l = k(null), [o, r] = $(!1), [c, y] = $(!0), [m, x] = $(!0);
-  M(() => {
-    const f = l.current;
-    f && (f.innerHTML = "", i.current.setSize(u, t), f.appendChild(i.current.$cvs), f.appendChild(i.current.overlay.$cvs), f.style.cursor = "pointer", Object.assign(i.current.overlay.$cvs.style, {
+const K = F(({ width: u, height: t, className: i, style: a, audioSrc: s }, r) => {
+  const e = k(new H()), h = k(new V()), l = k(null), [o, c] = M(!1), [m, y] = M(!0), [x, I] = M(!0);
+  _(r, () => ({
+    play: () => e.current.play(),
+    pause: () => e.current.pause(),
+    togglePlay: () => e.current.togglePlay(),
+    toggleMute: () => e.current.toggleMute(),
+    get isPlaying() {
+      return e.current.shouldPlay;
+    },
+    get isMuted() {
+      return e.current.isMuted;
+    },
+    get isLocked() {
+      return e.current.isLocked;
+    }
+  })), $(() => {
+    const p = l.current;
+    p && (p.innerHTML = "", h.current.setSize(u, t), p.appendChild(h.current.$cvs), p.appendChild(h.current.overlay.$cvs), p.style.cursor = "pointer", Object.assign(h.current.overlay.$cvs.style, {
       position: "absolute",
       inset: "0",
       width: "100%",
       height: "100%",
       pointerEvents: "none"
-    }), Object.assign(i.current.$cvs.style, {
+    }), Object.assign(h.current.$cvs.style, {
       position: "absolute",
       inset: "0",
       width: "100%",
       height: "100%"
     }));
-  }, []), M(() => {
-    i.current.setSize(u, t);
-  }, [u, t]), M(() => {
-    if (!e) return;
-    h.current.setSource(e), h.current.pause(), h.current.setMute(!0);
-    const f = g(
-      () => h.current.wave,
-      (p) => {
-        i.current.draw(p);
+  }, []), $(() => {
+    h.current.setSize(u, t);
+  }, [u, t]), $(() => {
+    if (!s) return;
+    e.current.setSource(s), e.current.pause(), e.current.setMute(!0);
+    const p = b(
+      () => e.current.wave,
+      (f) => {
+        h.current.draw(f);
       }
-    ), W = g(
-      () => h.current.shouldPlay,
-      (p) => r(!!p)
-    ), S = g(
-      () => h.current.isMuted,
-      (p) => y(!!p)
-    ), P = g(
-      () => h.current.isLocked,
-      (p) => {
-        x(!!p), y(h.current.isMuted);
+    ), W = b(
+      () => e.current.shouldPlay,
+      (f) => c(!!f)
+    ), S = b(
+      () => e.current.isMuted,
+      (f) => y(!!f)
+    ), L = b(
+      () => e.current.isLocked,
+      (f) => {
+        I(!!f), y(e.current.isMuted);
       }
     );
     return () => {
-      f(), W(), S(), P();
+      p(), W(), S(), L();
     };
-  }, [e]);
+  }, [s]);
   const N = () => {
-    h.current.togglePlay(), y(h.current.isMuted);
-  }, I = () => {
-    h.current.toggleMute();
+    e.current.togglePlay(), y(e.current.isMuted);
+  }, P = () => {
+    e.current.toggleMute();
   };
-  return /* @__PURE__ */ C("div", { className: s, style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }, children: [
-    /* @__PURE__ */ b(
+  return /* @__PURE__ */ C("div", { className: i, style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }, children: [
+    /* @__PURE__ */ g(
       "div",
       {
         ref: l,
@@ -250,14 +264,14 @@ const Y = ({ width: u, height: t, className: s, style: a, audioSrc: e }) => {
         }
       }
     ),
-    /* @__PURE__ */ b("div", { className: "flex gap-2 p-2", children: m ? /* @__PURE__ */ b("span", { className: "px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: "Click anywhere to unlock audio player" }) : /* @__PURE__ */ C(L, { children: [
-      /* @__PURE__ */ b("button", { onClick: N, className: "px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: o ? "Pause" : "Play" }),
-      /* @__PURE__ */ b("button", { onClick: I, className: "px-6 py-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: c ? "Unmute" : "Mute" })
+    /* @__PURE__ */ g("div", { className: "flex gap-2 p-2", children: x ? /* @__PURE__ */ g("span", { className: "px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: "Click anywhere to unlock audio player" }) : /* @__PURE__ */ C(D, { children: [
+      /* @__PURE__ */ g("button", { onClick: N, className: "px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: o ? "Pause" : "Play" }),
+      /* @__PURE__ */ g("button", { onClick: P, className: "px-6 py-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95", children: m ? "Unmute" : "Mute" })
     ] }) })
   ] });
-};
+});
 export {
-  Y as WaveAnimReact,
-  Y as default
+  K as WaveAnimReact,
+  K as default
 };
 //# sourceMappingURL=index.js.map

@@ -1,5 +1,5 @@
 import { reaction } from 'mobx';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { AudioWave } from './audio-wave/AudioWave.js';
 import WaveCanvas from './wave-builder/WaveCanvas.js';
 
@@ -11,13 +11,39 @@ export interface WaveAnimReactProps {
   audioSrc?: string;
 }
 
-export const WaveAnimReact: React.FC<WaveAnimReactProps> = ({ width, height, className, style, audioSrc }) => {
+export type WaveAnimHandle = {
+  play: () => void;
+  pause: () => void;
+  togglePlay: () => void;
+  toggleMute: () => void;
+  isPlaying: boolean;
+  isMuted: boolean;
+  isLocked: boolean;
+};
+
+export const WaveAnimReact = forwardRef<WaveAnimHandle, WaveAnimReactProps>(({ width, height, className, style, audioSrc }, ref) => {
   const audioWave = useRef(new AudioWave());
   const waveCanvas = useRef(new WaveCanvas());
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [isLocked, setIsLocked] = useState(true);
+
+  useImperativeHandle(ref, () => ({
+    play: () => audioWave.current.play(),
+    pause: () => audioWave.current.pause(),
+    togglePlay: () => audioWave.current.togglePlay(),
+    toggleMute: () => audioWave.current.toggleMute(),
+    get isPlaying() {
+      return audioWave.current.shouldPlay;
+    },
+    get isMuted() {
+      return audioWave.current.isMuted;
+    },
+    get isLocked() {
+      return audioWave.current.isLocked;
+    }
+  }));
 
   // Init/attach canvases once
   useEffect(() => {
@@ -108,33 +134,17 @@ export const WaveAnimReact: React.FC<WaveAnimReactProps> = ({ width, height, cla
   };
 
   return (
-    <div className={className} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <div
-        ref={containerRef}
-        onClick={onClick}
-        style={{
-          backgroundColor: '#121212',
-          width: `${width}px`,
-          height: `${height}px`,
-          position: 'relative',
-          overflow: 'hidden',
-          ...style
-        }}
-      />
-      <div className='flex gap-2 p-2'>
-        {isLocked ? (
-          <span className='px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95'>Click anywhere to unlock audio player</span>
-        ) : (
-          <>
-            <button onClick={onClick} className='px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95'>
-              {isPlaying ? 'Pause' : 'Play'}
-            </button>
-            <button onClick={onClickMute} className='px-6 py-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95'>
-              {isMuted ? 'Unmute' : 'Mute'}
-            </button>
-          </>
-        )}
-      </div>
-    </div>
+    <div
+      ref={containerRef}
+      onClick={onClick}
+      style={{
+        backgroundColor: '#121212',
+        width: `${width}px`,
+        height: `${height}px`,
+        position: 'relative',
+        overflow: 'hidden',
+        ...style
+      }}
+    />
   );
-};
+});
