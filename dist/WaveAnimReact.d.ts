@@ -28,5 +28,7 @@ export declare const useWaveControls: (waveRef: React.RefObject<WaveAnimHandle>)
     togglePlay: (() => void) | undefined;
     toggleMute: (() => void) | undefined;
     destroy: (() => void) | undefined;
+    play: (() => void) | undefined;
+    pause: (() => void) | undefined;
 };
 //# sourceMappingURL=WaveAnimReact.d.ts.map

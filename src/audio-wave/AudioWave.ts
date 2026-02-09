@@ -9,7 +9,7 @@ We can get away with a low frame rate by animating the transition in the wave
 Theoretically, the sound processing is more intensive than the animation
 
 */
-const debug = false;
+const debug = true;
 
 const MIN_WAVE_ARRAY_LENGTH = 64;
 const DEFAULT_WAVE = Array(MIN_WAVE_ARRAY_LENGTH).fill(0);
@@ -17,12 +17,12 @@ const WAVE_FPS = 10;
 const SMOOTHING_TIME_CONSTANT = 0.85;
 const MIN_DECIBELS = -80;
 const MAX_DECIBELS = -10;
-const FFT_SIZE = Math.pow(2,11);//512;
+const FFT_SIZE = Math.pow(2, 11); //512;
 
 export class AudioWave implements IAudioWave {
   source!: MediaElementAudioSourceNode;
   analyserNode: AnalyserNode | undefined;
-  gainNode!: GainNode;
+  gainNode!: GainNode | undefined;
   buffer!: AudioBuffer;
   bufferData: unknown;
   bufferLength = 0;
@@ -58,8 +58,13 @@ export class AudioWave implements IAudioWave {
       toggleMute: action.bound,
       setMute: action.bound,
       shouldPlay: observable,
-      isLocked: observable,
+      isLocked: observable
     });
+
+    // Check if audio context is already unlocked
+    if (Howler.ctx && Howler.ctx.state === 'running') {
+      this.isLocked = false;
+    }
   }
 
   resetWave(): void {
@@ -115,6 +120,10 @@ export class AudioWave implements IAudioWave {
         if (this.shouldPlay) {
           this.play();
         }
+        // Check if already unlocked after load
+        if (Howler.ctx && Howler.ctx.state === 'running') {
+          this.isLocked = false;
+        }
       }),
       onend: action(() => {
         if (debug) console.log('howl.onend');
@@ -122,14 +131,19 @@ export class AudioWave implements IAudioWave {
         this.shouldPlay = false;
       }),
       onunlock: action(() => {
-         if (debug) console.log('unlock');
-         this.isLocked = false;
+        if (debug) console.log('unlock');
+        this.isLocked = false;
       })
     });
 
     // Create a single sound instance and keep its ID
     this.howlId = this.howl.play();
     this.howl.pause(this.howlId);
+
+    // Check if already unlocked after creating Howl
+    if (Howler.ctx && Howler.ctx.state === 'running') {
+      this.isLocked = false;
+    }
   }
 
   play = debounce(() => {
@@ -147,6 +161,13 @@ export class AudioWave implements IAudioWave {
     this.howl.play(this.howlId);
     this.buildNodes();
     this.hijackBuffer();
+
+    // Check if unlock happened after play attempt
+    setTimeout(() => {
+      if (Howler.ctx && Howler.ctx.state === 'running' && this.isLocked) {
+        this.isLocked = false;
+      }
+    }, 100);
   }, 50);
 
   pause(): void {
@@ -214,7 +235,7 @@ export class AudioWave implements IAudioWave {
 
     // Only connect analyser and gain nodes once to avoid multiple audio streams
     if (!this.nodesConnected) {
-      this.analyserNode?.connect(this.gainNode);
+      this.analyserNode?.connect(this.gainNode!);
       this.gainNode?.connect(Howler.ctx.destination);
       this.nodesConnected = true;
     }
@@ -241,7 +262,7 @@ export class AudioWave implements IAudioWave {
     this.wave = this.getWaveData();
   }
 
-  getRawWave(){
+  getRawWave() {
     this.analyserNode!.getByteFrequencyData(this.dataArray);
     return this.dataArray;
   }
@@ -294,11 +315,29 @@ export class AudioWave implements IAudioWave {
   }
 
   destroy(): void {
-    console.log('AudioWave destroy');
+    if (debug) console.log('AudioWave destroy');
+    this.howl.stop();
+    return;
+    /*
+    this.stopTick();
     this.pause();
-    this.howl?.unload();
+    if (this.howl) {
+      this.howl.stop();
+      this.howl.unload();
+    }
+    // cleanup analyser node
+    if (this.analyserNode) {
+      this.analyserNode.disconnect();
+      this.analyserNode = undefined;
+    }
+    // cleanup gain node
+    if (this.gainNode) {
+      this.gainNode.disconnect();
+      this.gainNode = undefined;
+    }
     this.resetWave();
     this.nodesConnected = false;
     this.built = false;
+    */
   }
 }

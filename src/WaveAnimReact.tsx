@@ -178,5 +178,14 @@ export const useWaveControls = (waveRef: React.RefObject<WaveAnimHandle>) => {
     return unsubscribe;
   }, [waveRef]);
 
-  return { isLocked, isMuted, isPlaying, togglePlay: waveRef.current?.togglePlay, toggleMute: waveRef.current?.toggleMute, destroy: waveRef.current?.destroy };
+  return {
+    isLocked, //
+    isMuted,
+    isPlaying,
+    togglePlay: waveRef.current?.togglePlay,
+    toggleMute: waveRef.current?.toggleMute,
+    destroy: waveRef.current?.destroy,
+    play: waveRef.current?.play,
+    pause: waveRef.current?.pause
+  };
 };

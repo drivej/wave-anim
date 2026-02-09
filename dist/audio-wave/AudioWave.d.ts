@@ -3,7 +3,7 @@ import { IAudioWave, WaveModel } from './IAudioPlayer';
 export declare class AudioWave implements IAudioWave {
     source: MediaElementAudioSourceNode;
     analyserNode: AnalyserNode | undefined;
-    gainNode: GainNode;
+    gainNode: GainNode | undefined;
     buffer: AudioBuffer;
     bufferData: unknown;
     bufferLength: number;

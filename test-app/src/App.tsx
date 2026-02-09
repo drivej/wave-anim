@@ -1,68 +1,55 @@
-import { useEffect, useRef, useState } from 'react';
-import WaveAnimReact, { useWaveControls, WaveAnimHandle } from 'wave-anim';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import './App.css';
-import audioSrc from './assets/48K_1713045663.m4a';
-
-// const useWaveControls = (waveRef: React.RefObject<WaveAnimHandle>) => {
-//   const [isLocked, setIsLocked] = useState(true);
-//   const [isMuted, setIsMuted] = useState(true);
-//   const [isPlaying, setIsPlaying] = useState(false);
-
-//   useEffect(() => {
-//     if (!waveRef.current) return;
-//     setIsLocked(waveRef.current.isLocked);
-//     setIsMuted(waveRef.current.isMuted);
-//     setIsPlaying(waveRef.current.isPlaying);
-//     waveRef.current.setMute(false);
-//     const unsubscribe = waveRef.current.subscribe((state) => {
-//       setIsPlaying(state.isPlaying);
-//       setIsMuted(state.isMuted);
-//       setIsLocked(state.isLocked);
-//     });
-//     return unsubscribe;
-//   }, [waveRef]);
-//   return { isLocked, isMuted, isPlaying, togglePlay: waveRef.current?.togglePlay, toggleMute: waveRef.current?.toggleMute };
-// };
 
 function App() {
-  const waveRef = useRef<WaveAnimHandle>(null!);
-  const [dimensions, setDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight
-  });
-  
-  const { isLocked, isMuted, isPlaying, togglePlay, toggleMute } = useWaveControls(waveRef);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const location = useLocation();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-      <WaveAnimReact ref={waveRef} width={dimensions.width * 0.9} height={300} audioSrc={audioSrc} onClick={() => waveRef.current.togglePlay()} />
+    <div style={{ minHeight: '100vh' }}>
+      {/* Navigation */}
+      <nav style={{
+        padding: '1rem 2rem',
+        backgroundColor: '#1a1a1a',
+        borderBottom: '2px solid #333',
+        display: 'flex',
+        gap: '1rem',
+        alignItems: 'center'
+      }}>
+        <Link
+          to="/"
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: location.pathname === '/' ? '#2563eb' : '#374151',
+            color: '#fff',
+            textDecoration: 'none',
+            borderRadius: '0.5rem',
+            fontWeight: '600',
+            transition: 'background-color 0.2s'
+          }}
+        >
+          Home
+        </Link>
+        <Link
+          to="/wave"
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: location.pathname === '/wave' ? '#2563eb' : '#374151',
+            color: '#fff',
+            textDecoration: 'none',
+            borderRadius: '0.5rem',
+            fontWeight: '600',
+            transition: 'background-color 0.2s'
+          }}
+        >
+          Wave Player
+        </Link>
+        <span style={{ marginLeft: 'auto', color: '#888', fontSize: '0.9rem' }}>
+          Current Route: {location.pathname}
+        </span>
+      </nav>
 
-      <div className='flex gap-2 p-2'>
-        {isLocked ? (
-          <span className='px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95'>Click anywhere to unlock audio player</span>
-        ) : (
-          <>
-            <button onClick={togglePlay} className='px-6 py-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95'>
-              {isPlaying ? 'Pause' : 'Play'}
-            </button>
-            <button onClick={toggleMute} className='px-6 py-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 active:scale-95'>
-              {isMuted ? 'Unmute' : 'Mute'}
-            </button>
-          </>
-        )}
-      </div>
+      {/* Page Content */}
+      <Outlet />
     </div>
   );
 }
